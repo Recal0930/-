@@ -800,4 +800,107 @@
         // 初始化雷达图
         function initRadarChart() {
             try {
-                if (radarInstance) rada
+                if (radarInstance) radarInstance.dispose();
+                const width = radarChart.offsetWidth;
+                const height = radarChart.offsetHeight;
+                if (width === 0 || height === 0) {
+                    radarChart.style.width = '100%';
+                    radarChart.style.height = '300px';
+                }
+                radarInstance = echarts.init(radarChart);
+                const data = [
+                    Math.floor(Math.random() * 20) + 10,
+                    Math.floor(Math.random() * 20) + 8,
+                    Math.floor(Math.random() * 20) + 12,
+                    Math.floor(Math.random() * 20) + 5,
+                    Math.floor(Math.random() * 20) + 15
+                ];
+                const option = {
+                    radar: {
+                        indicator: [
+                            { name: '心态活力', max: 30 },
+                            { name: '情绪稳定', max: 30 },
+                            { name: '社交倾向', max: 30 },
+                            { name: '冒险精神', max: 30 },
+                            { name: '责任感', max: 30 }
+                        ],
+                        shape: 'circle',
+                        radius: '60%',
+                        axisName: { color: '#666', fontSize: 13 },
+                        splitLine: { color: '#e5e5e5' },
+                        splitArea: { areaStyle: { color: ['#fafafa', '#f5f5f5'] } }
+                    },
+                    series: [{
+                        type: 'radar',
+                        data: [{
+                            value: data,
+                            name: '你的心理维度',
+                            areaStyle: { color: `${currentThemeColor}20` },
+                            lineStyle: { color: currentThemeColor, width: 2 },
+                            itemStyle: { color: currentThemeColor, radius: 4 },
+                            label: { show: false }
+                        }]
+                    }],
+                    tooltip: { trigger: 'item' },
+                    legend: { show: false }
+                };
+                radarInstance.setOption(option);
+                window.addEventListener('resize', () => radarInstance.resize());
+            } catch (e) {
+                const randomData = [
+                    Math.floor(Math.random() * 20) + 10,
+                    Math.floor(Math.random() * 20) + 8,
+                    Math.floor(Math.random() * 20) + 12,
+                    Math.floor(Math.random() * 20) + 5,
+                    Math.floor(Math.random() * 20) + 15
+                ];
+                radarChart.innerHTML = `
+                    <div style="padding: 20px; text-align: center;">
+                        <h4 style="color: #666; margin-bottom: 15px;">你的心理维度评分</h4>
+                        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; font-size: 14px;">
+                            <span style="color: #999;">心态活力：${randomData[0]}</span>
+                            <span style="color: #999;">情绪稳定：${randomData[1]}</span>
+                            <span style="color: #999;">社交倾向：${randomData[2]}</span>
+                            <span style="color: #999;">冒险精神：${randomData[3]}</span>
+                            <span style="color: #999;">责任感：${randomData[4]}</span>
+                        </div>
+                    </div>
+                `;
+                console.error('雷达图加载失败：', e);
+            }
+        }
+
+        // 显示提示
+        function showAlert(text) {
+            alert.innerText = text;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 1500);
+        }
+
+        // 事件绑定
+        startBtn.onclick = () => {
+            const age = Number(ageInput.value);
+            if (isNaN(age) || age < 12 || age > 100) {
+                showAlert('请输入12-100的有效年龄');
+                return;
+            }
+            actualAge = age;
+            introBox.style.display = 'none';
+            ageInputBox.style.display = 'none';
+            questionContainer.style.display = 'block';
+            initQuestion(0);
+            // 恢复初始标题（避免答题过程中显示结果页标题）
+            pageHeader.innerText = '心理年龄深度测试';
+        };
+
+        wechatShare.onclick = () => wechatTip.style.display = 'flex';
+        closeTip.onclick = () => wechatTip.style.display = 'none';
+
+        window.onload = () => {
+            if (typeof echarts === 'undefined') {
+                radarChart.innerHTML = '<div style="line-height: 300px; color: #999;">图表库加载失败，将显示文字版数据</div>';
+            }
+        };
+    </script>
+</body>
+</html>
